@@ -1,14 +1,14 @@
 const express = require('express')
 const app = express()
-const executeQuery = require('./modules/database');
+
+const productsRouter = require('./routes/products')
+const usersRouter = require('./routes/users')
+const ordersRouter = require('./routes/orders')
 
 app.use(express.json())
 
-app.get('/orders', (req, res) => {
-    executeQuery('select * from pof_purchasing.orders', (error, results) => {
-        if (error) throw error
-        res.status(200).json({ success: true, data: results })
-    })
-})
+app.use('/products', productsRouter)
+app.use('/users', usersRouter)
+app.use('/orders', ordersRouter)
 
 app.listen(3000)
