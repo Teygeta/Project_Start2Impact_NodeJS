@@ -3,7 +3,7 @@ const router = express.Router()
 const executeQuery = require('../modules/database');
 
 router.get('/', (req, res) => {
-  executeQuery('SELECT * FROM planty_of_food.orders', (error, results) => {
+  executeQuery('SELECT * FROM orders', (error, results) => {
     if (error) throw error
 
     const users = Object.values(JSON.parse(JSON.stringify(results)));
@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params
   executeQuery(`
-    SELECT * FROM planty_of_food.orders 
+    SELECT * FROM orders 
     WHERE id_order LIKE ${id}
         `, (error, results) => {
     if (error) throw error
@@ -37,7 +37,7 @@ router.post('/', (req, res) => {
   const { id_order, id_product, id_user } = req.body
 
   executeQuery(`
-    INSERT INTO planty_of_food.orders (id_order, id_product, id_user)
+    INSERT INTO orders (id_order, id_product, id_user)
     VALUES (${id_order}, ${id_product}, ${id_user})
   `, (error, results) => {
     if (error) throw error

@@ -3,7 +3,7 @@ const router = express.Router()
 const executeQuery = require('../modules/database');
 
 router.get('/', (req, res) => {
-  executeQuery('SELECT * FROM planty_of_food.users;', (error, results) => {
+  executeQuery('SELECT * FROM users;', (error, results) => {
     if (error) throw error
 
     const users = Object.values(JSON.parse(JSON.stringify(results)));
@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params
   executeQuery(`
-    SELECT * FROM planty_of_food.users 
+    SELECT * FROM users 
     WHERE id_user LIKE ${id};
     `, (error, results) => {
     if (error) throw error
@@ -37,7 +37,7 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   const { name_user, email_user, surname_user, } = req.body
   executeQuery(`
-    INSERT INTO planty_of_food.users (name_user, email_user, surname_user)
+    INSERT INTO users (name_user, email_user, surname_user)
     VALUES ("${name_user}","${email_user}","${surname_user}");
     `, (error, results) => {
     if (error) throw error
@@ -53,7 +53,7 @@ router.patch('/:id', (req, res) => {
   const { name_user, surname_user, email_user } = req.body
 
   executeQuery(`
-  SELECT * FROM planty_of_food.users 
+  SELECT * FROM users 
   WHERE id_user LIKE ${id};
   `, (error, results) => {
     //transform to string > object > array for remove "query result object" tipe
@@ -65,7 +65,7 @@ router.patch('/:id', (req, res) => {
       .json({ success: false, data: `User dosen't exists` })
     else {
       executeQuery(`
-    UPDATE planty_of_food.users 
+    UPDATE users 
     SET 
         name_user = "${name_user}", 
         surname_user = "${surname_user}", 
@@ -87,7 +87,7 @@ router.patch('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const { id } = req.params
   executeQuery(`
-    DELETE FROM planty_of_food.users
+    DELETE FROM users
     WHERE id_user = ${id};
     `, (error, results) => {
     if (error) throw error

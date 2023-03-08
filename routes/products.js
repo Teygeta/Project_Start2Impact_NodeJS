@@ -3,7 +3,7 @@ const router = express.Router()
 const executeQuery = require('../modules/database');
 
 router.get('/', (req, res) => {
-  executeQuery('SELECT * FROM planty_of_food.products;', (error, results) => {
+  executeQuery('SELECT * FROM products;', (error, results) => {
     if (error) throw error
     //transform to string > object > array for remove "query result object" type
     const products = Object.values(JSON.parse(JSON.stringify(results)));
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params
   executeQuery(`
-    SELECT * FROM planty_of_food.products 
+    SELECT * FROM products 
     WHERE id_product LIKE ${id};
     `, (error, results) => {
     if (error) throw error
@@ -47,7 +47,7 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   const { product } = req.body
   executeQuery(`
-    INSERT INTO planty_of_food.products (name_product) 
+    INSERT INTO products (name_product) 
     VALUES ("${product}");
     `, (error, results) => {
     if (error) throw error
@@ -66,7 +66,7 @@ router.patch('/:id', (req, res) => {
   const { product } = req.body
   //query for verify if product exist
   executeQuery(` 
-    SELECT * FROM planty_of_food.products 
+    SELECT * FROM products 
     WHERE id_product LIKE ${id};
     `, (error, results) => {
     if (error) throw error
@@ -79,7 +79,7 @@ router.patch('/:id', (req, res) => {
     }
     else { //else (if product exist) query product to patch
       executeQuery(`
-    UPDATE planty_of_food.products 
+    UPDATE products 
     SET name_product = "${product}" 
     WHERE id_product = ${id};
     `, (error, results) => {
@@ -101,7 +101,7 @@ router.delete('/:id', (req, res) => {
   //because I used ON DELETE CASCADE when creating the tables
   const { id } = req.params
   executeQuery(`
-    DELETE FROM planty_of_food.products 
+    DELETE FROM products 
     WHERE id_product = ${id};
     `, (error, results) => {
     if (error) throw error
