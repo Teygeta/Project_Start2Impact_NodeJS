@@ -11,4 +11,10 @@ app.use('/products', productsRouter)
 app.use('/users', usersRouter)
 app.use('/orders', ordersRouter)
 
+app.get("/", (req, res) => {
+  res
+    .status(200)
+    .json({ message: "Welcome to my project!" });
+});
+
 app.listen(3000)
