@@ -60,13 +60,12 @@ router.post('/', (req, res) => {
   })
 })
 
-//I use patch because I edit only the name_product column
-router.patch('/:id', (req, res) => {
+router.put('/:id', (req, res) => {
   const { id } = req.params
   const { product } = req.body
   //query for verify if product exist
   executeQuery(` 
-    SELECT * FROM products 
+    SELECT id_product FROM products 
     WHERE id_product LIKE ${id};
     `, (error, results) => {
     if (error) throw error
@@ -77,10 +76,9 @@ router.patch('/:id', (req, res) => {
         .status(200)
         .json({ success: false, data: `Product dosen't exists` })
     }
-    else { //else (if product exist) query product to patch
+    else { //else (if product exist) query product to put
       executeQuery(`
-    UPDATE products 
-    SET name_product = "${product}" 
+    UPDATE products SET name_product = "${product}" 
     WHERE id_product = ${id};
     `, (error, results) => {
         if (error) throw error

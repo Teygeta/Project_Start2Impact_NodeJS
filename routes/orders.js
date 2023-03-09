@@ -2,15 +2,15 @@ const express = require('express')
 const router = express.Router()
 const executeQuery = require('../modules/database');
 
+//TODO fare un join per ritornare anche i nomi prodotti e utenti
 router.get('/', (req, res) => {
-  executeQuery('SELECT * FROM orders', (error, results) => {
-    if (error) throw error
-
-    const users = Object.values(JSON.parse(JSON.stringify(results)));
-    if (users.length < 1) {
+  executeQuery('SELECT DISTINCT id_order FROM orders', (error, results) => {
+    if (error) throw (error.message)
+    const orders = Object.values(JSON.parse(JSON.stringify(results)));
+    if (orders.length < 1) {
       res
         .status(200)
-        .json({ success: true, data: "No orders in the table" })
+        .json({ success: true, data: 'No orders in the table' })
     } else {
       res
         .status(200)
@@ -18,7 +18,6 @@ router.get('/', (req, res) => {
     }
   })
 })
-
 
 router.get('/:id', (req, res) => {
   const { id } = req.params
@@ -43,10 +42,57 @@ router.post('/', (req, res) => {
     if (error) throw error
     res
       .status(200)
-      .json({ success: true, data: "Order added correctly" })
+      .json({ success: true, data: 'Order added correctly' })
   })
 })
 
-router
+router.put('/:id/:number', (req, res) => {
+  const { id, number } = req.params
+  const { id_product, id_user } = req.body
+
+  executeQuery(`
+    SELECT number_order FROM orders
+    WHERE number_order = ${number}
+  `, (error, results) => {
+    if (error) throw error
+
+    const orders = Object.values(JSON.parse(JSON.stringify(results)));
+    if (orders.length < 1) res
+      .status(200)
+      .json({ success: false, data: `Order dosen't exists` })
+    else {
+      executeQuery(`
+      UPDATE orders SET 
+      id_product = ${id_product},
+      id_user = ${id_user}
+      WHERE id_order = ${id} AND number_order = ${number};
+      `, (error, results) => {
+        if (error) throw error
+        res
+          .status(200)
+          .json({
+            success: true,
+            state: `Order updated correctly`
+          })
+      })
+    }
+  })
+})
+
+router.delete('/:id/:number?', (req, res) => {
+  const { id, number } = req.params
+  let query = `DELETE FROM orders WHERE id_order = ${id}`
+  if (number) {
+    query += ` AND number_order = ${number}`
+  }
+  executeQuery(query, (error, results) => {
+    if (error) throw error
+    res.status(200).json({
+      success: true,
+      state: 'Order deleted correctly'
+    })
+  })
+})
+
 
 module.exports = router

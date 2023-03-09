@@ -47,13 +47,13 @@ router.post('/', (req, res) => {
   })
 })
 
-//TODO trovare modo per patchare solo una voce (es: solo il nome)
-router.patch('/:id', (req, res) => {
+//TODO trovare modo per modificare solo una voce (es: solo il nome)
+router.put('/:id', (req, res) => {
   const { id } = req.params
   const { name_user, surname_user, email_user } = req.body
 
   executeQuery(`
-  SELECT * FROM users 
+  SELECT id_user FROM users 
   WHERE id_user LIKE ${id};
   `, (error, results) => {
     //transform to string > object > array for remove "query result object" tipe
@@ -65,8 +65,7 @@ router.patch('/:id', (req, res) => {
       .json({ success: false, data: `User dosen't exists` })
     else {
       executeQuery(`
-    UPDATE users 
-    SET 
+    UPDATE users SET 
         name_user = "${name_user}", 
         surname_user = "${surname_user}", 
         email_user = "${email_user}"
