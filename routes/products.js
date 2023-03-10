@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
   })
 })
 
-
+//TODO sviluppare get come negli ordini (quindi col parametro opzionale)
 router.get('/:id', (req, res) => {
   const { id } = req.params
   executeQuery(`

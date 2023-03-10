@@ -1,7 +1,7 @@
 const mysql = require('mysql')
 const dotenv = require('dotenv');
 
-dotenv.config() //TODO ricommittare .env nel progetto
+dotenv.config()
 
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -15,3 +15,6 @@ function executeQuery(sql, callback) {
 }
 
 module.exports = executeQuery
+
+//TODO ricommittare .env nel progetto quando sara' finito
+//TODO aggiungere colonna quantita' nella tabella products_orders

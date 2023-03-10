@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 08, 2023 at 05:31 PM
+-- Generation Time: Mar 09, 2023 at 06:08 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -28,30 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `orders` (
-  `number_order` int(11) NOT NULL,
   `id_order` int(11) NOT NULL,
   `date_order` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `id_product` int(11) NOT NULL,
   `id_user` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`number_order`, `id_order`, `date_order`, `id_product`, `id_user`) VALUES
-(1, 2432, '2022-03-01 14:36:22', 2, 3),
-(2, 2432, '2023-03-08 15:26:12', 11, 3),
-(3, 2432, '2023-01-08 14:36:12', 5, 3),
-(4, 2432, '2023-03-08 16:36:14', 6, 3),
-(5, 5767, '2023-03-08 15:36:12', 12, 2),
-(6, 5767, '2022-03-18 14:36:22', 10, 2),
-(7, 5767, '2023-01-08 15:36:12', 5, 2),
-(8, 9785, '2023-03-18 15:34:12', 2, 1),
-(9, 9785, '2023-01-08 14:36:22', 3, 1),
-(10, 4563, '2023-01-21 15:36:12', 7, 4),
-(11, 4563, '2021-03-08 16:24:12', 9, 4),
-(12, 4563, '2023-02-08 15:36:12', 14, 4);
 
 -- --------------------------------------------------------
 
@@ -61,7 +41,7 @@ INSERT INTO `orders` (`number_order`, `id_order`, `date_order`, `id_product`, `i
 
 CREATE TABLE `products` (
   `id_product` int(11) NOT NULL,
-  `name_product` text DEFAULT NULL
+  `name_product` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -83,6 +63,17 @@ INSERT INTO `products` (`id_product`, `name_product`) VALUES
 (12, 'noodles'),
 (13, 'merluzzo'),
 (14, 'gelato');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `products_orders`
+--
+
+CREATE TABLE `products_orders` (
+  `id_order` int(11) NOT NULL,
+  `id_product` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -115,9 +106,8 @@ INSERT INTO `users` (`id_user`, `name_user`, `surname_user`, `email_user`) VALUE
 -- Indexes for table `orders`
 --
 ALTER TABLE `orders`
-  ADD PRIMARY KEY (`number_order`),
-  ADD KEY `id_product` (`id_product`),
-  ADD KEY `id_user` (`id_user`);
+  ADD PRIMARY KEY (`id_order`),
+  ADD KEY `orders_ibfk_2` (`id_user`);
 
 --
 -- Indexes for table `products`
@@ -125,6 +115,13 @@ ALTER TABLE `orders`
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id_product`),
   ADD UNIQUE KEY `name_product` (`name_product`) USING HASH;
+
+--
+-- Indexes for table `products_orders`
+--
+ALTER TABLE `products_orders`
+  ADD KEY `products_orders_ibfk_1` (`id_order`),
+  ADD KEY `products_orders_ibfk_2` (`id_product`);
 
 --
 -- Indexes for table `users`
@@ -141,7 +138,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `number_order` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_order` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -163,8 +160,14 @@ ALTER TABLE `users`
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`id_product`) REFERENCES `products` (`id_product`) ON DELETE CASCADE,
   ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `products_orders`
+--
+ALTER TABLE `products_orders`
+  ADD CONSTRAINT `products_orders_ibfk_1` FOREIGN KEY (`id_order`) REFERENCES `orders` (`id_order`) ON DELETE CASCADE,
+  ADD CONSTRAINT `products_orders_ibfk_2` FOREIGN KEY (`id_product`) REFERENCES `products` (`id_product`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

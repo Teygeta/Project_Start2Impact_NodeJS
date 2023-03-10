@@ -2,97 +2,71 @@ const express = require('express')
 const router = express.Router()
 const executeQuery = require('../modules/database');
 
-//TODO fare un join per ritornare anche i nomi prodotti e utenti
-router.get('/', (req, res) => {
-  executeQuery('SELECT DISTINCT id_order FROM orders', (error, results) => {
-    if (error) throw (error.message)
-    const orders = Object.values(JSON.parse(JSON.stringify(results)));
-    if (orders.length < 1) {
-      res
-        .status(200)
-        .json({ success: true, data: 'No orders in the table' })
-    } else {
-      res
-        .status(200)
-        .json({ success: true, data: results })
-    }
-  })
-})
-
-router.get('/:id', (req, res) => {
+router.get('/:id?', (req, res) => {
   const { id } = req.params
-  executeQuery(`
-    SELECT * FROM orders 
-    WHERE id_order LIKE ${id}
-        `, (error, results) => {
-    if (error) throw error
+  let query = 'SELECT * FROM orders'
+
+  if (id) query = `SELECT id_product FROM products_orders WHERE id_order = ${id}`
+
+  executeQuery(query, (error, results) => {
+    if (error) {
+      res
+        .status(409)
+        .json({ success: false, error: error.sqlMessage })
+    }
     res
       .status(200)
-      .json({ success: true, data: results })
+      .json({ success: true, state: results })
   })
 })
 
 router.post('/', (req, res) => {
-  const { id_order, id_product, id_user } = req.body
+  const { id_user } = req.body
 
   executeQuery(`
-    INSERT INTO orders (id_order, id_product, id_user)
-    VALUES (${id_order}, ${id_product}, ${id_user})
+    INSERT INTO orders (id_user) VALUES (${id_user});
   `, (error, results) => {
-    if (error) throw error
+    if (error) {
+      res
+        .status(409)
+        .json({ success: false, error: error.sqlMessage })
+    }
     res
       .status(200)
-      .json({ success: true, data: 'Order added correctly' })
+      .json({ success: true, state: "Order created correctly" })
   })
 })
 
-router.put('/:id/:number', (req, res) => {
-  const { id, number } = req.params
-  const { id_product, id_user } = req.body
+//insert product into specific order 
+// (example: localhost:3000/orders/3/add_products?id=1)
+router.post('/:id_order/add_products', (req, res) => {
+  const { id_order } = req.params
+  const { id } = req.query //id product (trovare il modo di gestier piu' id inseriti nella query string)
 
   executeQuery(`
-    SELECT number_order FROM orders
-    WHERE number_order = ${number}
+    INSERT INTO products_orders (id_order, id_product) 
+    VALUES (${id_order}, ${id}); 
   `, (error, results) => {
-    if (error) throw error
-
-    const orders = Object.values(JSON.parse(JSON.stringify(results)));
-    if (orders.length < 1) res
-      .status(200)
-      .json({ success: false, data: `Order dosen't exists` })
-    else {
-      executeQuery(`
-      UPDATE orders SET 
-      id_product = ${id_product},
-      id_user = ${id_user}
-      WHERE id_order = ${id} AND number_order = ${number};
-      `, (error, results) => {
-        if (error) throw error
-        res
-          .status(200)
-          .json({
-            success: true,
-            state: `Order updated correctly`
-          })
-      })
+    if (error) {
+      res
+        .status(409)
+        .json({ success: false, error: error.sqlMessage })
     }
+    res
+      .status(200)
+      .json({ success: true, state: `Product ${id} added correctly into order ${id_order}` })
   })
 })
 
-router.delete('/:id/:number?', (req, res) => {
-  const { id, number } = req.params
-  let query = `DELETE FROM orders WHERE id_order = ${id}`
-  if (number) {
-    query += ` AND number_order = ${number}`
-  }
-  executeQuery(query, (error, results) => {
-    if (error) throw error
-    res.status(200).json({
-      success: true,
-      state: 'Order deleted correctly'
-    })
-  })
+router.put('/', (req, res) => {
+  executeQuery(`
+  
+  `)
 })
-
+router.delete('/', (req, res) => {
+  executeQuery(`
+  
+  `)
+})
 
 module.exports = router
