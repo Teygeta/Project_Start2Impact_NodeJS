@@ -6,11 +6,10 @@ router.get('/', (req, res) => {
   executeQuery('SELECT * FROM users;', (error, results) => {
     if (error) throw error
 
-    const users = Object.values(JSON.parse(JSON.stringify(results)));
     if (users.length < 1) {
       res
-        .status(200)
-        .json({ success: true, data: "No users in the table" })
+        .status(404)
+        .json({ success: true, data: "No users registered" })
     } else {
       res
         .status(200)
@@ -27,15 +26,23 @@ router.get('/:id', (req, res) => {
     WHERE id_user LIKE ${id};
     `, (error, results) => {
     if (error) throw error
-    res
-      .status(200)
-      .json({ success: true, data: results })
+    if (results.length < 1) {
+      res
+        .status(404)
+        .json({ success: false, message: 'User not found' })
+    } else {
+      res
+        .status(200)
+        .json({ success: true, data: results })
+    }
+
   })
 })
 
-//TODO capire anche qui come gestire gli errori (chiedere anche a juri)
+// TODO controllo: prendere tutte le mail nel database e se gia' esiste ritornare errore
 router.post('/', (req, res) => {
   const { name_user, email_user, surname_user, } = req.body
+
   executeQuery(`
     INSERT INTO users (name_user, email_user, surname_user)
     VALUES ("${name_user}","${email_user}","${surname_user}");
@@ -56,12 +63,10 @@ router.put('/:id', (req, res) => {
   SELECT id_user FROM users 
   WHERE id_user LIKE ${id};
   `, (error, results) => {
-    //transform to string > object > array for remove "query result object" tipe
-    if (error) throw error
 
-    const users = Object.values(JSON.parse(JSON.stringify(results)));
-    if (users.length < 1) res
-      .status(200)
+    if (error) throw error
+    if (results.length < 1) res
+      .status(404)
       .json({ success: false, data: `User dosen't exists` })
     else {
       executeQuery(`
