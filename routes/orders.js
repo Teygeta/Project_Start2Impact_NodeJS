@@ -10,11 +10,8 @@ router.get('/:id?', (req, res) => {
   if (id) query = `SELECT id_product, quantity FROM products_orders WHERE id_order = ${id}`
 
   executeQuery(query, (error, results) => {
-    if (error) {
-      res
-        .status(409)
-        .json({ success: false, error: error.sqlMessage })
-    }
+    if (error) res.status(409).json({ success: false, error: error.sqlMessage })
+
     res
       .status(200)
       .json({ success: true, state: results })

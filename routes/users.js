@@ -2,29 +2,14 @@ const express = require('express')
 const router = express.Router()
 const executeQuery = require('../modules/database');
 
-router.get('/', (req, res) => {
-  executeQuery('SELECT * FROM users;', (error, results) => {
-    if (error) throw error
+router.get('/:id?', (req, res) => {
 
-    if (users.length < 1) {
-      res
-        .status(404)
-        .json({ success: true, data: "No users registered" })
-    } else {
-      res
-        .status(200)
-        .json({ success: true, data: results })
-    }
-
-  })
-})
-
-router.get('/:id', (req, res) => {
   const { id } = req.params
-  executeQuery(`
-    SELECT * FROM users 
-    WHERE id_user LIKE ${id};
-    `, (error, results) => {
+
+  let query = 'SELECT * FROM users;'
+  if (id) query = `SELECT * FROM users WHERE id_user = ${id};`
+
+  executeQuery(query, (error, results) => {
     if (error) throw error
     if (results.length < 1) {
       res
@@ -35,18 +20,19 @@ router.get('/:id', (req, res) => {
         .status(200)
         .json({ success: true, data: results })
     }
-
   })
 })
+
 
 // TODO controllo: prendere tutte le mail nel database e se gia' esiste ritornare errore
 router.post('/', (req, res) => {
   const { name_user, email_user, surname_user, } = req.body
 
-  executeQuery(`
+  let query = `
     INSERT INTO users (name_user, email_user, surname_user)
     VALUES ("${name_user}","${email_user}","${surname_user}");
-    `, (error, results) => {
+    `
+  executeQuery(query, (error, results) => {
     if (error) throw error
     res
       .status(200)
@@ -54,36 +40,30 @@ router.post('/', (req, res) => {
   })
 })
 
-//TODO trovare modo per modificare solo una voce (es: solo il nome)
 router.put('/:id', (req, res) => {
   const { id } = req.params
   const { name_user, surname_user, email_user } = req.body
 
-  executeQuery(`
-  SELECT id_user FROM users 
-  WHERE id_user LIKE ${id};
-  `, (error, results) => {
+  let query = `
+  UPDATE users SET 
+    name_user = "${name_user}", 
+    surname_user = "${surname_user}", 
+    email_user = "${email_user}"
+  WHERE id_user = ${id};
+  `
 
+  executeQuery(query, (error, results) => {
     if (error) throw error
-    if (results.length < 1) res
+    if (results.affectedRows === 0) res
       .status(404)
-      .json({ success: false, data: `User dosen't exists` })
+      .json({ success: false, data: `User not found` })
     else {
-      executeQuery(`
-    UPDATE users SET 
-        name_user = "${name_user}", 
-        surname_user = "${surname_user}", 
-        email_user = "${email_user}"
-    WHERE id_user = ${id};
-    `, (error, results) => {
-        if (error) throw error
-        res
-          .status(200)
-          .json({
-            success: true,
-            state: `User updated correctly`
-          })
-      })
+      res
+        .status(200)
+        .json({
+          success: true,
+          state: `User updated correctly`
+        })
     }
   })
 })

@@ -2,15 +2,20 @@ const express = require('express')
 const router = express.Router()
 const executeQuery = require('../modules/database');
 
-router.get('/', (req, res) => {
-  executeQuery('SELECT * FROM products;', (error, results) => {
-    if (error) throw error
-    //transform to string > object > array for remove "query result object" type
-    const products = Object.values(JSON.parse(JSON.stringify(results)));
-    if (products.length < 1) {
+router.get('/:id?', (req, res) => {
+
+  const { id } = req.params
+
+  let query = 'SELECT * FROM products;'
+  if (id) query = `SELECT * FROM products WHERE id_product = ${id};`
+
+  executeQuery(query, (error, results) => {
+    if (error) res.status(409).json({ success: false, error: error.sqlMessage })
+
+    if (results.length < 1) {
       res
-        .status(200)
-        .json({ success: false, data: `No product in the table` })
+        .status(404)
+        .json({ success: false, data: `Product not found` })
     }
     else {
       res
@@ -24,9 +29,9 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params
   executeQuery(`
-    SELECT * FROM products 
+  SELECT * FROM products 
     WHERE id_product LIKE ${id};
-    `, (error, results) => {
+  `, (error, results) => {
     if (error) throw error
 
     const products = Object.values(JSON.parse(JSON.stringify(results)));
