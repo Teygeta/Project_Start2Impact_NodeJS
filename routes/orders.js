@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const executeQuery = require('../modules/database');
 
-//select the list of orders or select a specific order
+// GET ORDER OR SINGLE ORDER
 router.get('/:id?', (req, res) => {
   const { id } = req.params
   let query = 'SELECT * FROM orders'
@@ -18,7 +18,7 @@ router.get('/:id?', (req, res) => {
   })
 })
 
-//a specific users creating order
+// CREATE ORDER
 router.post('/', (req, res) => {
   const { id_user } = req.body
 
@@ -38,6 +38,7 @@ router.post('/', (req, res) => {
 
 //insert product and quantity into specific order 
 // (example: localhost:3000/orders/3/add_products?id=1)
+// EDIT ORDER
 router.post('/:id_order/add_products', (req, res) => {
   const { id_order } = req.params
   const { id, quantity } = req.query //id product (trovare il modo di gestier piu' id inseriti nella query string)
@@ -90,5 +91,7 @@ router.put('/:id_order/:id_product', (req, res) => {
   })
 
 })
+
+// DELETE ORDER
 
 module.exports = router
