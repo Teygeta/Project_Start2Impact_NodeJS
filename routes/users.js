@@ -39,7 +39,7 @@ router.post('/', (req, res) => {
       if (error.code === 'ER_DUP_ENTRY') {
         return res
           .status(404)
-          .json({ success: true, data: "User already exist" })
+          .json({ success: true, data: `${email_user} already exist` })
       } throw error
     }
 
