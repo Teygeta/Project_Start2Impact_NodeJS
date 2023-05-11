@@ -10,11 +10,7 @@ const connection = mysql.createConnection({
   database: process.env.DB_DATABASE
 })
 
-function executeQuery(sql, callback) {
-  connection.query(sql, callback);
-}
-
-module.exports = executeQuery
+module.exports = connection
 
 //TODO ricommittare .env nel progetto quando sara' finito
 //TODO aggiungere colonna quantita' nella tabella products_orders

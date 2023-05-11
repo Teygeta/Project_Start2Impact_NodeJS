@@ -1,15 +1,17 @@
 const express = require('express')
 const router = express.Router()
-const executeQuery = require('../modules/database');
+const connection = require('../modules/database');
 
 // GET PRODUCTS OR SINGLE PRODUCT
 router.get('/:id?', (req, res) => {
   const { id } = req.params
 
   let query = 'SELECT * FROM products;'
-  if (id) query = `SELECT * FROM products WHERE id_product = ${id};`
+  if (id) query = `SELECT * FROM products WHERE id_product = ?;`
 
-  executeQuery(query, (error, results) => {
+  const values = [id]
+
+  connection.query(query, values, (error, results) => {
     if (error) throw error
     if (results.length < 1) {
       return res
@@ -28,9 +30,11 @@ router.get('/:id?', (req, res) => {
 router.post('/', (req, res) => {
   const { product } = req.body
 
-  let query = `INSERT INTO products (name_product) VALUES ("${product}");`
+  let query = `INSERT INTO products (name_product) VALUES (?);`
 
-  executeQuery(query, (error, results) => {
+  const values = [product]
+
+  connection.query(query, values, (error, results) => {
     if (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         return res
@@ -51,10 +55,13 @@ router.put('/:id', (req, res) => {
   const { product } = req.body
 
   let query = `
-  UPDATE products SET name_product = "${product}" 
-  WHERE id_product = ${id};
+  UPDATE products SET name_product = ? 
+  WHERE id_product = ?;
   `
-  executeQuery(query, (error, results) => {
+
+  const values = [id, product]
+
+  connection.query(query, values, (error, results) => {
     if (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         return res
@@ -80,9 +87,11 @@ router.put('/:id', (req, res) => {
 // DELETE PRODUCT
 router.delete('/:id', (req, res) => {
   const { id } = req.params
-  let query = `DELETE FROM products WHERE id_product = ${id};`
+  let query = `DELETE FROM products WHERE id_product = ?;`
 
-  executeQuery(query, (error, results) => {
+  const values = [id]
+
+  connection.query(query, values, (error, results) => {
     if (error) throw error
     if (results.affectedRows === 0) {
       return res.status(404).json({

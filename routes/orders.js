@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const executeQuery = require('../modules/database');
+const connection = require('../modules/database');
 
 // GET ORDER OR SINGLE ORDER
 router.get('/:id?', (req, res) => {
@@ -11,9 +11,11 @@ router.get('/:id?', (req, res) => {
   if (id) query = `SELECT name_product, quantity FROM products_orders 
   INNER JOIN products 
   ON products_orders.id_product = products.id_product
-  WHERE id_order = ${id}`
+  WHERE id_order = ?`
 
-  executeQuery(query, (error, results) => {
+  const values = [id]
+
+  connection.query(query, values, (error, results) => {
     if (error) throw error
     if (results.length < 1) {
       return res
@@ -33,9 +35,11 @@ router.get('/:id?', (req, res) => {
 router.post('/', (req, res) => {
   const { id_user } = req.body
 
-  executeQuery(`
-    INSERT INTO orders (id_user) VALUES (${id_user});
-  `, (error, results) => {
+  let query = `INSERT INTO orders (id_user) VALUES (?);`
+
+  const values = [id_user]
+
+  connection.query(query, values, (error, results) => {
     if (error) {
       switch (error.code) {
         case 'ER_DUP_ENTRY':
@@ -61,10 +65,14 @@ router.post('/:id_order/add_products', (req, res) => {
   const { id_order } = req.params
   const { id, quantity } = req.query
 
-  executeQuery(`
-    INSERT INTO products_orders (id_order, id_product, quantity) 
-    VALUES (${id_order}, ${id}, ${quantity ? quantity : 1}); 
-  `, (error, results) => {
+  let query = `
+  INSERT INTO products_orders (id_order, id_product, quantity) 
+  VALUES (${id_order}, ${id}, ${quantity ? quantity : 1}); 
+`
+
+  const values = [id_order, id, quantity ? quantity : 1]
+
+  connection.query(query, values, (error, results) => {
     if (error) {
       switch (error.code) {
         case 'ER_DUP_ENTRY':
@@ -99,7 +107,7 @@ router.put('/:id_order', (req, res) => {
   WHERE id_order=${id_order} AND id_product=${id_product}
 `
 
-  executeQuery(query, (error, results) => {
+  connection.query(query, (error, results) => {
     if (error) {
       if (error.code) {
         return res
@@ -115,5 +123,49 @@ router.put('/:id_order', (req, res) => {
 })
 
 // DELETE ORDER
+router.delete('/:id', (req, res) => {
+  const { id } = req.params
+  let query = `DELETE FROM order WHERE id_product = ?;`
+
+  const values = [id]
+
+  connection.query(query, values, (error, results) => {
+    if (error) throw error
+    if (results.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        data: `Product not found`
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      state: `Product deleted correctly`
+    })
+  })
+})
+
+// DELETE PRODUCT INSIDE ORDER
+router.delete('/:id', (req, res) => {
+  const { id } = req.params
+  let query = `DELETE FROM order WHERE id_product = ?;`
+
+  const values = [id]
+
+  connection.query(query, values, (error, results) => {
+    if (error) throw error
+    if (results.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        data: `Product not found`
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      state: `Product deleted correctly`
+    })
+  })
+})
 
 module.exports = router
