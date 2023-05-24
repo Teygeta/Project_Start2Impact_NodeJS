@@ -7,6 +7,7 @@ router.get('/:id?', (req, res) => {
   const { id } = req.params
 
   let query = 'SELECT * FROM products;'
+
   if (id) query = `SELECT * FROM products WHERE id_product = ?;`
 
   const values = [id]
@@ -55,11 +56,12 @@ router.put('/:id', (req, res) => {
   const { product } = req.body
 
   let query = `
-  UPDATE products SET name_product = ? 
-  WHERE id_product = ?;
+  UPDATE products
+  SET name_product = ?
+  WHERE id_product = ?; 
   `
 
-  const values = [id, product]
+  const values = [product, id]
 
   connection.query(query, values, (error, results) => {
     if (error) {

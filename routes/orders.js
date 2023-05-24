@@ -5,6 +5,7 @@ const connection = require('../modules/database');
 // GET ORDER OR SINGLE ORDER
 router.get('/:id?', (req, res) => {
   const { id } = req.params
+
   let query = `SELECT id_order, date_order, name_user FROM orders
   INNER JOIN users ON orders.id_user = users.id_user`
 
@@ -20,7 +21,7 @@ router.get('/:id?', (req, res) => {
     if (results.length < 1) {
       return res
         .status(404)
-        .json({ success: false, message: 'Order is empty' })
+        .json({ success: false, message: 'Order not found or is empty' })
     }
 
     res.status(200).json({
@@ -74,6 +75,7 @@ router.post('/:id_order/add_products', (req, res) => {
 
   connection.query(query, values, (error, results) => {
     if (error) {
+
       switch (error.code) {
         case 'ER_DUP_ENTRY':
           return res
@@ -108,6 +110,12 @@ router.put('/:id_order', (req, res) => {
 `
 
   connection.query(query, (error, results) => {
+    if (results.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        data: `Order or product not found`
+      })
+    }
     if (error) {
       if (error.code) {
         return res
@@ -115,7 +123,7 @@ router.put('/:id_order', (req, res) => {
           .json({ success: false, data: `Order ${id_order} or product ${id_product} not found` })
       } throw error
     }
-    console.log(res);
+
     res
       .status(200)
       .json({ success: true, state: `Product with id ${id_product} in order ${id_order} modified correctly` })
@@ -125,7 +133,7 @@ router.put('/:id_order', (req, res) => {
 // DELETE ORDER
 router.delete('/:id', (req, res) => {
   const { id } = req.params
-  let query = `DELETE FROM order WHERE id_product = ?;`
+  let query = `DELETE FROM orders WHERE id_order = ?;`
 
   const values = [id]
 
@@ -134,36 +142,38 @@ router.delete('/:id', (req, res) => {
     if (results.affectedRows === 0) {
       return res.status(404).json({
         success: false,
-        data: `Product not found`
+        data: `Oreder not found`
       })
     }
 
     res.status(200).json({
       success: true,
-      state: `Product deleted correctly`
+      state: `Order ${id} deleted correctly`
     })
   })
 })
 
 // DELETE PRODUCT INSIDE ORDER
-router.delete('/:id', (req, res) => {
-  const { id } = req.params
-  let query = `DELETE FROM order WHERE id_product = ?;`
+router.delete('/:id_order/delete_products', (req, res) => {
+  const { id_order } = req.params
+  const { id } = req.query
 
-  const values = [id]
+  let query = `DELETE FROM products_orders WHERE id_order = ? AND id_product = ?;`
+
+  const values = [id_order, id]
 
   connection.query(query, values, (error, results) => {
     if (error) throw error
     if (results.affectedRows === 0) {
       return res.status(404).json({
         success: false,
-        data: `Product not found`
+        data: `Product or order not found`
       })
     }
 
     res.status(200).json({
       success: true,
-      state: `Product deleted correctly`
+      state: `Product ${id} deleted correctly from order ${id_order}`
     })
   })
 })

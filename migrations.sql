@@ -57,7 +57,7 @@ INSERT INTO `products` (`id_product`, `name_product`) VALUES
 (6, 'riso'),
 (7, 'marmellata'),
 (8, 'avocado'),
-(9, 'nocci'),
+(9, 'noci'),
 (10, 'rucola'),
 (11, 'peperoni'),
 (12, 'noodles'),
@@ -71,8 +71,10 @@ INSERT INTO `products` (`id_product`, `name_product`) VALUES
 --
 
 CREATE TABLE `products_orders` (
+  `id_relation` int(11) NOT NULL,
   `id_order` int(11) NOT NULL,
-  `id_product` int(11) NOT NULL
+  `id_product` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -93,10 +95,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id_user`, `name_user`, `surname_user`, `email_user`) VALUES
-(1, 'Mario', 'Rossi', 'mrossi@email.mail'),
-(2, 'Maria', 'Viola', 'mviola@email.mail'),
-(3, 'Luigi', 'Verdi', 'lverdi@email.mail'),
-(4, 'Sara', 'Neri', 'sneri@email.mail');
+(1, 'Mario', 'Rossi', 'mrossi@example.mail'),
+(2, 'Maria', 'Viola', 'mviola@example.mail'),
+(3, 'Luigi', 'Verdi', 'lverdi@example.mail'),
+(4, 'Sara', 'Neri', 'sneri@example.mail');
 
 --
 -- Indexes for dumped tables

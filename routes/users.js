@@ -97,7 +97,7 @@ router.delete('/:id', (req, res) => {
   const values = [id]
 
   connection.query(query, values, (error, results) => {
-    if (error) console.log(error);
+    if (error) throw error;
     if (results.affectedRows === 0) {
       return res.status(404).json({
         success: false,
