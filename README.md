@@ -100,9 +100,9 @@
 
 - Delete product inside a order: `/orders/<ORDER ID>/delete_products?id=<PRODUCT ID>`
 
-example:
+     example:
 
-`/orders/4/delete_products?id=4`
+     `/orders/4/delete_products?id=4`
 <br/><br/><br/>
 
   
