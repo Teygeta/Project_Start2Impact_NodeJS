@@ -1,4 +1,8 @@
 # API DOC
+
+- [PRODUCTS](#products)
+- [USERS](#users)
+- [ORDERS](#orders)
 ## PRODUCTS
 ### GET:
 
