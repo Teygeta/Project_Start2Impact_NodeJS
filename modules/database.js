@@ -11,6 +11,3 @@ const connection = mysql.createConnection({
 })
 
 module.exports = connection
-
-//TODO ricommittare .env nel progetto quando sara' finito
-//TODO aggiungere colonna quantita' nella tabella products_orders
