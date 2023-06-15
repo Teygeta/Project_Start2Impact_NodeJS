@@ -59,7 +59,7 @@
 
 - Delete a user: `/users/<USER ID>`
   <br/><br/><br/>
-  ## ORDERS 
+## ORDERS 
 ### GET:
 
 - Read the list of all orders: `/orders`
