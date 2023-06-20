@@ -1,3 +1,13 @@
+# Getting started
+1. `git clone https://github.com/Teygeta/Project_Start2Impact_NodeJS.git`
+2. run `npm i`
+3. creates a MySQL database called `planty_of_food`
+4. through the file `db_migrations.sql`, copy the contents and run the sql queries in the table `planty_of_food`
+5. if you use Postman, use the `api_project.postman_collection.json` file to take advantage of the API calls already written or read the documentation below ("API DOC")
+6. run the database
+7. run `npm nodemon`
+8. run an api call
+
 # API DOC
 
 - [PRODUCTS](#products)
