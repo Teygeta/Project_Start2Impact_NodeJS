@@ -4,7 +4,6 @@
 3. creates a MySQL database called `planty_of_food`
 4. through the file `db_migrations.sql`, copy the contents and run the sql queries in the `planty_of_food` db
 5. if you use Postman, use the `api_project.postman_collection.json` file to take advantage of the API calls already written or read the documentation below ("API DOC")
-6. run the database
 7. run `npm nodemon`
 8. run an api call
 
